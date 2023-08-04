@@ -1,0 +1,8 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist/client" // Папка для сохранения скомпилированных файлов для клиента
+  },
+  "include": ["src"], // Подключение папки src с TypeScript кодом клиента для компиляции
+  "exclude": ["node_modules", "dist"] // Исключение файлов, которые не нужно компилировать
+}

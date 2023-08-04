@@ -1,0 +1,19 @@
+{
+  "name": "todo2.0",
+  "version": "1.0.0",
+  "private": true,
+
+  "scripts": {
+    "start:all": "concurrently \"npm run start:server\" \"npm run start:client\"",
+    "start:server": "cd server && npm start",
+    "start:client": "cd client && npm start"
+  },
+  "devDependencies": {
+    "concurrently": "^7.0.0",
+    "prettier": "3.0.0",
+    "typescript": "^4.9.5"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
