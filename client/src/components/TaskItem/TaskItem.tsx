@@ -1,87 +1,63 @@
-import React, { useState, useMemo } from "react";
-import "./TaskItem.css";
+import React, { useState } from "react";
 import classNames from "classnames";
-
-export interface Task {
-  text: string;
-  completed: boolean;
-}
+import { Task } from "../../../../server/src/types/types";
+import { deleteTask, fetchTasks, updateTask } from "../../http/apiTasks";
 
 interface TaskItemProps {
   task: Task;
   setTasks: (tasks: Task[]) => void;
-  index: number;
-  tasks: Task[];
 }
 
-const TaskItem: React.FC<TaskItemProps> = ({
-  task,
-  setTasks,
-  index,
-  tasks,
-}) => {
-  const [editingIndex, setEditingIndex] = useState<number | null>(null); //текущая задача
-  const [editValue, setEditValue] = useState<string>(""); // значение текущей задачи
-  const [isEditing, setIsEditing] = useState<boolean>(false); //состояние отображения
+const TaskItem: React.FC<TaskItemProps> = ({ task, setTasks }) => {
+  const [editing, setEditing] = useState<boolean>(false);
+  const [editValue, setEditValue] = useState<string>(task.title);
 
-  function resetEditing() {
-    setEditingIndex(null);
-    setIsEditing(false);
-  }
-
-  function handleDelete(index: number) {
-    if (index === editingIndex) {
-      resetEditing();
+  async function handleDelete() {
+    try {
+      await deleteTask(task.id);
+      const updatedTasks = await fetchTasks();
+      setTasks(updatedTasks); // Обновляем список задач после успешного удаления
+    } catch (error) {
+      console.error("Error deleting task:", error);
     }
-    const taskToDelete = tasks[index];
-    const newTasks = tasks.filter((task) => task !== taskToDelete);
-    setTasks(newTasks);
   }
 
-  function handleEdit(index: number) {
-    setEditingIndex(index);
-    setEditValue(tasks[index].text);
-    setIsEditing(true);
+  async function handleEdit() {
+    setEditing(true);
   }
 
-  function handleCancel() {
-    resetEditing();
+  async function handleCancel() {
+    setEditing(false);
+    setEditValue(task.title);
   }
 
-  function handleSave() {
-    const newTasks = tasks.map((task, index) =>
-      index === editingIndex ? { ...task, text: editValue } : task,
-    );
-    setTasks(newTasks);
-    resetEditing();
-  }
+  // async function handleSave() {
+  //   try {
+  //     const updatedTask = { ...task, title: editValue };
+  //     // Ваш код для обновления задачи на сервере, если нужно
+  //     setEditing(false);
+  //   } catch (error) {
+  //     console.error("Error updating task:", error);
+  //   }
+  // }
 
-  function handleComplete(index: number) {
-    const newTasks = tasks.map((task, i) =>
-      i === index
-        ? {
-            ...task,
-            completed: !task.completed,
-          }
-        : task,
-    );
-    setTasks(newTasks);
+  async function handleComplete() {
+    try {
+      const updatedTask = { ...task, completed: !task.completed };
+      updateTask(task.id, updatedTask);
+    } catch (error) {
+      console.error("Error updating task:", error);
+    }
   }
-
-  //определяем индекс текущей задачи, чтобы выполнять операции над ней(редактирование или удаление.)Чтобы не было ошибок с индексом при отфильтрованном индексе.
-  const originalIndex = useMemo(
-    () => tasks.findIndex((t) => t === task),
-    [tasks, task],
-  );
 
   return (
-    <li key={index} className="task">
+    <li className="task">
       <input
         type="checkbox"
         checked={task.completed}
-        onChange={() => handleComplete(originalIndex)}
+        onChange={handleComplete}
       />
-      {originalIndex === editingIndex && isEditing ? (
+      {editing ? (
         <>
           <input
             type="text"
@@ -89,7 +65,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
             onChange={(e) => setEditValue(e.target.value)}
           />
           <div className="task__buttons">
-            <button onClick={handleSave}>Save</button>
+            {/* <button onClick={handleSave}>Save</button> */}
             <button onClick={handleCancel}>Cancel</button>
           </div>
         </>
@@ -100,16 +76,17 @@ const TaskItem: React.FC<TaskItemProps> = ({
               task_completed: task.completed,
             })}
           >
-            {task.text}
+            {task.title}
           </span>
 
           <div className="task__buttons">
-            <button onClick={() => handleEdit(originalIndex)}>Edit</button>
-            <button onClick={() => handleDelete(originalIndex)}>Delete</button>
+            <button onClick={handleEdit}>Edit</button>
+            <button onClick={handleDelete}>Delete</button>
           </div>
         </>
       )}
     </li>
   );
 };
+
 export default TaskItem;

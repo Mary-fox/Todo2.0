@@ -1,42 +1,44 @@
-import React, { useState, useCallback, ChangeEvent } from "react";
-import { Task } from "../TaskItem/TaskItem";
+import React, { useState } from "react";
+import { Task, Category } from "../../../../server/src/types/types";
 import "./TaskForm.css";
 
 interface TaskFormProps {
-  setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+  setTasks: (tasks: Task[]) => void;
+  categories: Category[];
 }
 
-const TaskForm: React.FC<TaskFormProps> = ({ setTasks }) => {
-  const [inputValue, setInputValue] = useState<string>("");
+const TaskForm: React.FC<TaskFormProps> = ({ categories }) => {
+  const [taskText, setTaskText] = useState<string>("");
 
-  const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-  }, []);
-
-  const handleSubmit = useCallback(
-    (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      if (inputValue.trim() === "") return;
-      setTasks((prevTasks) => [
-        ...prevTasks,
-        { text: inputValue, completed: false },
-      ]);
-      setInputValue("");
-    },
-    [inputValue, setTasks],
-  );
+  const handleAddTask = () => {
+    if (taskText.trim() === "") return;
+    // const newTask: Task = {
+    //   id: tasks.length + 1, // Assuming you have a unique id for the tasks
+    //   title: taskText, // Changed to title to match the Task interface
+    //   completed: false,
+    // };
+    // setTasks([...tasks, newTask]);
+    // setTaskText("");
+  };
 
   return (
-    <form className="tasks__form" onSubmit={handleSubmit}>
+    <div className="task-form">
       <input
         type="text"
-        value={inputValue}
-        onChange={handleChange}
-        placeholder="new task"
+        value={taskText}
+        onChange={(e) => setTaskText(e.target.value)}
       />
-      <button type="submit">Add Todo</button>
-    </form>
+      <button onClick={handleAddTask}>Add Task</button>
+      <select>
+        <option value={undefined}>Select Category</option>
+        {categories.map((category) => (
+          <option key={category.id} value={category.id}>
+            {category.name}
+          </option>
+        ))}
+      </select>
+    </div>
   );
 };
 
-export default React.memo(TaskForm);
+export default TaskForm;
