@@ -7,7 +7,6 @@ export interface Category {
   export interface Task {
     id: number;
     title: string;
-    text: string;
     completed: boolean;
     categoryId?: number; // categoryId является опциональным
   }

@@ -1,24 +1,30 @@
 import React, { useState } from "react";
 import { Task, Category } from "../../../../server/src/types/types";
 import "./TaskForm.css";
+import { addTask } from "../../http/apiTasks";
 
 interface TaskFormProps {
-  setTasks: (tasks: Task[]) => void;
+  setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
   categories: Category[];
 }
 
-const TaskForm: React.FC<TaskFormProps> = ({ categories }) => {
+const TaskForm: React.FC<TaskFormProps> = ({ categories, setTasks }) => {
   const [taskText, setTaskText] = useState<string>("");
 
-  const handleAddTask = () => {
+  const handleAddTask = async () => {
     if (taskText.trim() === "") return;
-    // const newTask: Task = {
-    //   id: tasks.length + 1, // Assuming you have a unique id for the tasks
-    //   title: taskText, // Changed to title to match the Task interface
-    //   completed: false,
-    // };
-    // setTasks([...tasks, newTask]);
-    // setTaskText("");
+    try {
+      const newTask: Partial<Task> = {
+        title: taskText,
+        completed: false,
+      };
+
+      const addedTask = await addTask(newTask as Task);
+      setTasks((prevTasks) => [...prevTasks, addedTask]);
+      setTaskText("");
+    } catch (error) {
+      console.error("Error adding task:", error);
+    }
   };
 
   return (

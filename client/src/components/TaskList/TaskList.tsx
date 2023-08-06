@@ -6,7 +6,7 @@ import TaskItem from "../TaskItem/TaskItem";
 interface TaskListProps {
   tasks: Task[];
   filteredTasks: Task[]; // Add filteredTasks to the interface
-  setTasks: (tasks: Task[]) => void;
+  setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
 }
 
 const TaskList: React.FC<TaskListProps> = ({ filteredTasks, setTasks }) => {

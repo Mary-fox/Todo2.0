@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
-// import axios from "axios";
 import TaskForm from "../TaskForm/TaskForm";
 import TaskList from "../TaskList/TaskList";
 import { Category, Task } from "../../../../server/src/types/types";
-// import { $host } from "../../http/Api";
-import { fetchTasks } from "../../http/apiTasks"; // Import the functions
+import { fetchTasks } from "../../http/apiTasks";
 
 const ToDo: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [taskFilter, setTaskFilter] = useState<string>("");
   // const [categories, setCategories] = useState<Category[]>([]);
   const [categories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number | undefined>(
@@ -32,14 +31,14 @@ const ToDo: React.FC = () => {
     }
   }, [selectedCategory, tasks]);
 
-  // const fetchTasks = async () => {
-  //   try {
-  //     const response = await $host.get<Task[]>("/api/tasks");
-  //     setTasks(response.data);
-  //   } catch (error) {
-  //     console.error("Error fetching tasks:", error);
-  //   }
-  // };
+  useEffect(() => {
+    // Фильтруем задачи на основе текста из инпута
+    const filtered = tasks.filter((task) =>
+      task.title.toUpperCase().includes(taskFilter.toUpperCase()),
+    );
+    setFilteredTasks(filtered);
+  }, [taskFilter, tasks]);
+
   const fetchTasksFromApi = async () => {
     try {
       const tasks = await fetchTasks();
@@ -79,6 +78,12 @@ const ToDo: React.FC = () => {
   return (
     <div className="tasks__block">
       <h1 className="tasks__title">My Todo List</h1>
+      <input
+        value={taskFilter}
+        type="text"
+        placeholder="filter"
+        onChange={(e) => setTaskFilter(e.target.value)}
+      />
       {/* <button onClick={seedCategories}>Seed Categories</button> */}
       <select value={selectedCategory} onChange={handleCategoryChange}>
         <option value={undefined}>All</option>

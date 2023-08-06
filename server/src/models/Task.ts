@@ -61,9 +61,6 @@ export interface TaskAttributes {
   id?: number;
   title: string;
   completed: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
-  deletedAt?: Date;
 }
 
 class Task extends Model<TaskAttributes> {

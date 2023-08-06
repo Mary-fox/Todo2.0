@@ -11,7 +11,7 @@ export const fetchTasks = async () => {
   }
 };
 
-export const addTask =async (task: Task)  => {
+export const addTask = async (task: Task) => {
   try {
     const response = await $host.post("/api/tasks", task);
     return response.data;
@@ -21,7 +21,10 @@ export const addTask =async (task: Task)  => {
   }
 };
 
-export const updateTask =  async (taskId: number, updatedTask: Task): Promise<Task[]> => {
+export const updateTask = async (
+  taskId: number,
+  updatedTask: Partial<Task>,
+): Promise<Task> => {
   try {
     const response = await $host.put(`/api/tasks/${taskId}`, updatedTask);
     return response.data;
@@ -32,11 +35,11 @@ export const updateTask =  async (taskId: number, updatedTask: Task): Promise<Ta
 };
 
 export const deleteTask = async (id: number) => {
-    try {
-        const { data } = await $host.delete(`/api/tasks/${id}`);
-        return data;
-    } catch (error) {
-      console.error("Error deleting task:", error);
-      throw error;
-    }
-  };
+  try {
+    const { data } = await $host.delete(`/api/tasks/${id}`);
+    return data;
+  } catch (error) {
+    console.error("Error deleting task:", error);
+    throw error;
+  }
+};

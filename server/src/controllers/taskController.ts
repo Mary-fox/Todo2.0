@@ -25,12 +25,12 @@ export const getAllTasks = async (req: Request, res: Response) => {
 
 
 export const createTask = async (req: Request, res: Response) => {
-  const { title,  completed } = req.body;
+  const { title, completed } = req.body;
   try {
     const task = await Task.create({ title, completed });
-    res.status(201).json(task);
+    res.status(201).json({ id: task.id, title, completed });
   } catch (error) {
-    res.status(500).json({ error: 'Error creating task' });
+    res.status(500).json({ error: "Error creating task" });
   }
 };
 
