@@ -1,9 +1,8 @@
 import express from 'express';
 import cors from 'cors';
-// import categoryRoutes from './routes/categoryRoutes';
-// import taskRoutes from './routes/taskRouter';
-import router from './routes'; 
+import router from './routes/index'; 
 import  sequelize  from '../src/config/database';
+import errorHandler from './middleware/ErrorHandingMiddleware';
 
 require('dotenv').config();
 const app = express();
@@ -11,16 +10,9 @@ const PORT = process.env.PORT || 8000;
 
 app.use(cors());
 app.use(express.json());
-// app.use('/api', (req, res) => {
-//   res.send('Server is up and running!');
-// });
-
-// Add your routes here
-// app.use('/api/categories', categoryRoutes);
-// app.use('/api/tasks', taskRoutes);
-app.use('/api', router); // Используем главный роутер с префиксом /api
-
- // Подставьте путь к файлу с вашим объектом sequelize
+app.use('/api', router); 
+//обработка ошибок
+app.use(errorHandler);
 
  sequelize
  .sync()
