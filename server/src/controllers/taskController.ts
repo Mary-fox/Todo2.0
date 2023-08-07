@@ -1,10 +1,10 @@
-import { Request, Response } from 'express';
+import { Request, Response ,NextFunction} from 'express';
 import  {Task}  from '../models/Task';
+import ApiError from '../error/ApiError';
 // Начальные данные задач
 const initialTasks = [
   { title: 'Task 1', id:1, completed: false },
   { title: 'Task 2', id:2, completed: false },
-  // Добавьте другие задачи по аналогии
 ];
 export const getAllTasks = async (req: Request, res: Response) => {
   try {
@@ -24,31 +24,31 @@ export const getAllTasks = async (req: Request, res: Response) => {
 };
 
 
-export const createTask = async (req: Request, res: Response) => {
+export const createTask = async (req: Request, res: Response, next: NextFunction) => {
   const { title, completed } = req.body;
   try {
     const task = await Task.create({ title, completed });
     res.status(201).json({ id: task.id, title, completed });
   } catch (error) {
-    res.status(500).json({ error: "Error creating task" });
+    next(ApiError.badRequest('Error creating task'));
   }
 };
 
-export const getTaskById = async (req: Request, res: Response) => {
+export const getTaskById = async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   try {
     const task = await Task.findByPk(id);
     if (task) {
       res.status(200).json(task);
     } else {
-      res.status(404).json({ error: 'Task not found' });
+      next(ApiError.badRequest('Task not found'));
     }
   } catch (error) {
-    res.status(500).json({ error: 'Error fetching task' });
+    next(ApiError.badRequest('Error fetching task'));
   }
 };
 
-export const updateTask = async (req: Request, res: Response) => {
+export const updateTask = async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   const { title,  completed, categoryId } = req.body;
   try {
@@ -60,14 +60,14 @@ export const updateTask = async (req: Request, res: Response) => {
       await task.save();
       res.status(200).json(task);
     } else {
-      res.status(404).json({ error: 'Task not found' });
+      next(ApiError.badRequest('Task not found'));
     }
   } catch (error) {
-    res.status(500).json({ error: 'Error updating task' });
+    next(ApiError.badRequest('Error updating task'));
   }
 };
 
-export const deleteTask = async (req: Request, res: Response) => {
+export const deleteTask = async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   try {
     const task = await Task.findByPk(id);
@@ -75,9 +75,9 @@ export const deleteTask = async (req: Request, res: Response) => {
       await task.destroy();
       res.sendStatus(204);
     } else {
-      res.status(404).json({ error: 'Task not found' });
+      next(ApiError.badRequest('Task not found'));
     }
   } catch (error) {
-    res.status(500).json({ error: 'Error deleting task' });
+    error instanceof Error && next(ApiError.badRequest(error.message));
   }
 };

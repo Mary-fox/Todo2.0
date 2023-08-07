@@ -16,7 +16,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, setTasks }) => {
   async function handleDelete() {
     try {
       await deleteTask(task.id);
-      setTasks((prevTasks) => prevTasks.filter((t) => t.id !== task.id)); // Remove the deleted task from the list
+      setTasks((prevTasks) => prevTasks.filter((t) => t.id !== task.id));
     } catch (error) {
       console.error("Error deleting task:", error);
     }
