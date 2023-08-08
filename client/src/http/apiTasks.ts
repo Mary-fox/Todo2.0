@@ -53,3 +53,40 @@ export const fetchCategories = async (): Promise<Category[]> => {
     throw error;
   }
 };
+
+export const fetchTaskCategories = async (taskId: number): Promise<Category[]> => {
+  try {
+    const response = await $host.get(`/api/tasks/${taskId}/categories`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching task categories:", error);
+    throw error;
+  }
+};
+
+export const addCategoriesToTask = async (taskId: number, categoryIds: number[]) => {
+  try {
+    await $host.post(`/api/tasks/${taskId}/categories`, { categoryIds }); // Отправляем POST-запрос на сервер
+  } catch (error) {
+    console.error("Error adding categories to task:", error);
+    throw error;
+  }
+};
+
+// export const removeCategoriesFromTask = async (taskId: number, categoryIds: number[]) => {
+//   try {
+//     await $host.delete(`/api/tasks/${taskId}/categories`, { data: { categoryIds } }); // Отправляем DELETE-запрос на сервер с данными о категориях
+//   } catch (error) {
+//     console.error("Error removing categories from task:", error);
+//     throw error;
+//   }
+// };
+export const removeCategoryFromTask = async (taskId: number, categoryId: number) => {
+  try {
+    const response = await $host.delete(`/api/tasks/${taskId}/categories/${categoryId}`);
+    return response.data; // Если вы хотите обработать ответ сервера
+  } catch (error) {
+    console.error('Error removing category from task:', error);
+    throw error;
+  }
+};

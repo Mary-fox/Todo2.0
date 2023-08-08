@@ -54,6 +54,7 @@ Category.init(
     },
   },
   {
+    modelName: 'Category',
     tableName: 'Categories',
     sequelize,
   }

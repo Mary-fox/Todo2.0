@@ -1,5 +1,6 @@
 import { Request, Response ,NextFunction} from 'express';
 import  {Task}  from '../models/Task';
+import { Category } from '../models/Category';
 import ApiError from '../error/ApiError';
 // Начальные данные задач
 const initialTasks = [
@@ -79,5 +80,94 @@ export const deleteTask = async (req: Request, res: Response, next: NextFunction
     }
   } catch (error) {
     error instanceof Error && next(ApiError.badRequest(error.message));
+  }
+};
+
+export const addCategoriesToTask = async (req: Request, res: Response) => {
+  try {
+    const taskId = req.params.id;
+    const { categoryIds } = req.body;
+
+    const task = await Task.findByPk(taskId);
+
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+
+    await task.addCategory(categoryIds);
+
+    res.status(200).json({ message: 'Categories added to task successfully' });
+  } catch (error) {
+    console.error("Error adding categories to task:", error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+export const getTaskCategories = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const task = await Task.findByPk(id, {
+      include: Category,
+    });
+
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+
+    const categories = await task.getCategories();
+
+    return res.status(200).json(categories);
+  } catch (error) {
+    console.error('Error fetching task categories:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+// export const removeCategoriesFromTask = async (req: Request, res: Response) => {
+//   try {
+//     const taskId = req.params.id;
+//     const { categoryIds } = req.body;
+
+//     const task = await Task.findByPk(taskId);
+
+//     if (!task) {
+//       return res.status(404).json({ error: 'Task not found' });
+//     }
+
+//     // Предполагается, что у вас есть метод removeCategories
+//     await task.removeCategories(categoryIds);
+
+//     res.status(200).json({ message: 'Categories removed from task successfully' });
+//   } catch (error) {
+//     console.error("Error removing categories from task:", error);
+//     res.status(500).json({ error: 'Internal Server Error' });
+//   }
+// };
+export const removeCategoryFromTask = async (req: Request, res: Response) => {
+  try {
+    const taskId = req.params.id;
+    const categoryId = req.params.categoryId;
+    // Получаем ID категории из параметров запроса
+
+    const task = await Task.findByPk(taskId);
+
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    const categoryToRemove = await Category.findByPk(categoryId);
+
+    if (!categoryToRemove) {
+      return res.status(404).json({ error: 'Category not found' });
+    }
+
+    // Удаляем связь категории с задачей
+    await task.removeCategory(categoryToRemove);
+
+    res.status(200).json({ message: 'Category removed from task successfully' });
+  } catch (error) {
+    console.error("Error removing category from task:", error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 };
