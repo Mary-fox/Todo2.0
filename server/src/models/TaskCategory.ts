@@ -1,36 +1,27 @@
-import { DataTypes, Model } from 'sequelize';
-import sequelize from '../config/database';
+// import { Model, DataTypes } from 'sequelize';
+// import sequelize from '../config/database';
 
-class TaskCategory extends Model {
-  public taskId!: number;
-  public categoryId!: number;
-}
+// class TaskCategory extends Model {
+//   public taskId!: number;
+//   public categoryId!: number;
+// }
 
-TaskCategory.init(
-  {
-    taskId: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      references: {
-        model: 'tasks',
-        key: 'id',
-      },
-    },
-    categoryId: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      references: {
-        model: 'categories',
-        key: 'id',
-      },
-    },
-  },
-  {
-    sequelize,
-    modelName: 'TaskCategory',
-    tableName: 'task_categories',
-    timestamps: false,
-  }
-);
+// TaskCategory.init(
+//   {
+//     taskId: {
+//       type: DataTypes.INTEGER,
+//       primaryKey: true,
+//     },
+//     categoryId: {
+//       type: DataTypes.INTEGER,
+//       primaryKey: true,
+//     },
+//   },
+//   {
+//     sequelize,
+//     modelName: 'TaskCategory',
+//     tableName: 'TaskCategories',
+//   },
+// );
 
-export default TaskCategory;
+// export { TaskCategory };

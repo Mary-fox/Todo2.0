@@ -9,11 +9,10 @@ const dbConfig = {
 };
 
 
-const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.password, {
+export const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.password, {
   host: dbConfig.host,
   port: dbConfig.port,
   dialect: 'postgres', 
 });
 
-export default sequelize;
 

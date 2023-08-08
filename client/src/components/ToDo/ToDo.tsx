@@ -2,13 +2,12 @@ import React, { useState, useEffect } from "react";
 import TaskForm from "../TaskForm/TaskForm";
 import TaskList from "../TaskList/TaskList";
 import { Category, Task } from "../../../../server/src/types/types";
-import { fetchTasks } from "../../http/apiTasks";
+import { fetchTasks, fetchCategories } from "../../http/apiTasks";
 
 const ToDo: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [taskFilter, setTaskFilter] = useState<string>("");
-  // const [categories, setCategories] = useState<Category[]>([]);
-  const [categories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number | undefined>(
     undefined,
   );
@@ -16,20 +15,8 @@ const ToDo: React.FC = () => {
 
   useEffect(() => {
     fetchTasksFromApi();
-    // fetchCategories();
+    fetchCategoriesFromApi();
   }, []);
-
-  useEffect(() => {
-    // Filter tasks based on the selected category
-    if (selectedCategory !== undefined) {
-      const filtered = tasks.filter(
-        (task) => task.categoryId === selectedCategory,
-      );
-      setFilteredTasks(filtered);
-    } else {
-      setFilteredTasks(tasks);
-    }
-  }, [selectedCategory, tasks]);
 
   useEffect(() => {
     // Фильтруем задачи на основе текста из инпута
@@ -47,25 +34,14 @@ const ToDo: React.FC = () => {
       console.error("Error fetching tasks:", error);
     }
   };
-
-  // const fetchCategories = async () => {
-  //   try {
-  //     const response = await $host.get<Category[]>("/api/categories");
-  //     setCategories(response.data);
-  //   } catch (error) {
-  //     console.error("Error fetching categories:", error);
-  //   }
-  // };
-
-  // const seedCategories = async () => {
-  //   try {
-  //     await $host.get("/api/seed-categories");
-  //     fetchCategories();
-  //   } catch (error) {
-  //     console.error("Error seeding categories:", error);
-  //   }
-  // };
-
+  const fetchCategoriesFromApi = async () => {
+    try {
+      const categories = await fetchCategories();
+      setCategories(categories); // Обновляем состояние категорий
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
   const handleCategoryChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
   ) => {
@@ -84,7 +60,6 @@ const ToDo: React.FC = () => {
         placeholder="filter"
         onChange={(e) => setTaskFilter(e.target.value)}
       />
-      {/* <button onClick={seedCategories}>Seed Categories</button> */}
       <select value={selectedCategory} onChange={handleCategoryChange}>
         <option value={undefined}>All</option>
         {categories.map((category) => (

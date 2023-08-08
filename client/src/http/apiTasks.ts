@@ -1,5 +1,5 @@
 import { $host } from "./Api";
-import { Task } from "../../../server/src/types/types";
+import { Task, Category } from "../../../server/src/types/types";
 
 export const fetchTasks = async () => {
   try {
@@ -40,6 +40,16 @@ export const deleteTask = async (id: number) => {
     return data;
   } catch (error) {
     console.error("Error deleting task:", error);
+    throw error;
+  }
+};
+
+export const fetchCategories = async (): Promise<Category[]> => {
+  try {
+    const response = await $host.get("/api/categories");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching categories:", error);
     throw error;
   }
 };

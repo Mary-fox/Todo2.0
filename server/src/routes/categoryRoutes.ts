@@ -1,14 +1,9 @@
-import express from 'express';
-import {
-  getAllCategories,
-  createCategory,
-  seedCategories,
-} from '../controllers/categoryController';
+import { Router } from 'express';
+import { getAllCategories } from '../controllers/categoryController';
 
-const router = express.Router();
+const router = Router();
 
-router.get('/categories', getAllCategories);
-router.post('/categories', createCategory);
-router.get('/seed-categories', seedCategories);
+router.get('/', getAllCategories);
+
 
 export default router;

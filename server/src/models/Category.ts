@@ -1,26 +1,48 @@
-import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from '../config/database';
+import { Model, DataTypes, FindOrCreateOptions } from 'sequelize';
+import { sequelize } from '../config/database';
 
-interface CategoryAttributes {
-  id: number;
+export interface CategoryAttributes {
+  id?: number;
   name: string;
   color: string;
 }
 
-interface CategoryCreationAttributes extends Optional<CategoryAttributes, 'id'> {}
-
-class Category extends Model<CategoryAttributes, CategoryCreationAttributes> implements CategoryAttributes {
+class Category extends Model<CategoryAttributes> {
   public id!: number;
   public name!: string;
   public color!: string;
+
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
+
+  static async initializeDefaultCategories() {
+    const defaultCategoriesData: Omit<CategoryAttributes, 'id'>[] = [
+      { name: 'Category 1', color: 'red' },
+      { name: 'Category 2', color: 'green' },
+      { name: 'Category 3', color: 'blue' },
+    ];
+
+    try {
+      for (const categoryData of defaultCategoriesData) {
+        const options: FindOrCreateOptions<CategoryAttributes> = {
+          where: { name: categoryData.name },
+          defaults: categoryData,
+        };
+
+        await Category.findOrCreate(options);
+      }
+    } catch (error) {
+      console.error('Error initializing default categories:', error);
+    }
+  }
 }
 
 Category.init(
   {
     id: {
       type: DataTypes.INTEGER,
-      primaryKey: true,
       autoIncrement: true,
+      primaryKey: true,
     },
     name: {
       type: DataTypes.STRING,
@@ -32,9 +54,9 @@ Category.init(
     },
   },
   {
+    tableName: 'Categories',
     sequelize,
-    modelName: 'Category',
   }
 );
 
-export default Category;
+export { Category };
