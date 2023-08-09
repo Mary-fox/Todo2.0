@@ -5,7 +5,7 @@ import {
   getTaskById,
   updateTask,
   deleteTask,
-  addCategoriesToTask, 
+  addCategoryToTask, 
   getTaskCategories,
   removeCategoryFromTask 
 } from '../controllers/taskController';
@@ -17,7 +17,7 @@ router.post('/', createTask);
 router.get('/:id', getTaskById);
 router.put('/:id', updateTask);
 router.delete('/:id', deleteTask);
-router.post('/:id/categories', addCategoriesToTask ); // Добавление категорий к задаче
+router.post('/:id/categories/:categoryId', addCategoryToTask ); // Добавление категорий к задаче
 router.get('/:id/categories', getTaskCategories);
 router.delete('/:id/categories/:categoryId', removeCategoryFromTask);
 

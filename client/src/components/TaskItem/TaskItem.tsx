@@ -7,21 +7,27 @@ import {
   updateTask,
   fetchCategories,
   fetchTaskCategories,
-  addCategoriesToTask,
+  addCategoryToTask,
   removeCategoryFromTask,
 } from "../../http/apiTasks";
 
 interface TaskItemProps {
   task: Task;
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+  editingCategories: boolean;
+  toggleCategoryDropdown: (taskId: number) => void;
 }
 
-const TaskItem: React.FC<TaskItemProps> = ({ task, setTasks }) => {
+const TaskItem: React.FC<TaskItemProps> = ({
+  task,
+  setTasks,
+  editingCategories,
+  toggleCategoryDropdown,
+}) => {
   const [editing, setEditing] = useState<boolean>(false);
   const [editValue, setEditValue] = useState<string>(task.title);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<Category[]>([]); // Добавляем состояние для категорий задачи
-  const [editingCategories, setEditingCategories] = useState<boolean>(false);
+  const [selectedCategories, setSelectedCategories] = useState<Category[]>([]); // состояние для категорий задачи
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,61 +53,32 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, setTasks }) => {
       const selectedCategory = categories.find((c) => c.id === categoryId);
       if (selectedCategory) {
         setSelectedCategories([...selectedCategories, selectedCategory]);
+        handleAddCategory(selectedCategory.id);
       }
     }
   };
 
-  async function handleAddCategories() {
+  async function handleAddCategory(categoryId: number) {
     try {
-      const categoryIdsToAdd = selectedCategories.map(
-        (category) => category.id,
-      );
-      await addCategoriesToTask(task.id, categoryIdsToAdd);
-      // Обновляем данные категорий для задачи
+      await addCategoryToTask(task.id, categoryId);
+
+      // Обновляем данные категорий для задачи после добавления
       const updatedCategories = await fetchTaskCategories(task.id);
 
       // Обновляем состояние задачи на клиенте
       const updatedTask = {
         ...task,
-        categories: updatedCategories, // Добавляем выбранные категории к текущим категориям задачи
+        categories: updatedCategories, // Обновляем категории в состоянии задачи
       };
       setTasks((prevTasks) =>
         prevTasks.map((t) => (t.id === task.id ? updatedTask : t)),
       );
       setSelectedCategories(updatedCategories);
-
-      setEditingCategories(false);
     } catch (error) {
-      console.error("Error adding categories:", error);
+      console.error("Error adding category:", error);
     }
   }
 
-  // async function handleRemoveCategories() {
-  //   try {
-  //     const categoryIdsToRemove = selectedCategories.map(
-  //       (category) => category.id,
-  //     );
-  //     await removeCategoriesFromTask(task.id, categoryIdsToRemove);
-
-  //     // Обновляем данные категорий для задачи после удаления
-  //     const updatedCategories = await fetchTaskCategories(task.id);
-
-  //     // Обновляем состояние задачи на клиенте
-  //     const updatedTask = {
-  //       ...task,
-  //       categories: updatedCategories, // Обновляем категории в состоянии задачи
-  //     };
-  //     setTasks((prevTasks) =>
-  //       prevTasks.map((t) => (t.id === task.id ? updatedTask : t)),
-  //     );
-  //     setSelectedCategories(updatedCategories);
-
-  //     // Завершаем режим редактирования категорий
-  //     setEditingCategories(false);
-  //   } catch (error) {
-  //     console.error("Error removing categories:", error);
-  //   }
-  // }
   async function handleRemoveCategory(categoryId: number) {
     try {
       await removeCategoryFromTask(task.id, categoryId);
@@ -203,35 +180,29 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, setTasks }) => {
           <div className="task__buttons">
             <button onClick={handleEdit}>Edit</button>
             <button onClick={handleDelete}>Delete</button>
-            {editingCategories && (
-              <button onClick={() => setEditingCategories(false)}>
-                Cancel
-              </button>
-            )}
-            {!editingCategories && (
-              <button onClick={() => setEditingCategories(true)}>
-                Manage Categories
-              </button>
-            )}
+            <button onClick={() => toggleCategoryDropdown(task.id)}>
+              {editingCategories ? "Cancel" : "Add"}
+            </button>
           </div>
         </>
       )}
       {editingCategories && (
         <div className="category-dialog">
-          <h3>Manage Categories</h3>
           {categories.map((category) => (
-            <label key={category.id}>
-              <input
-                type="checkbox"
-                checked={selectedCategories.some((c) => c.id === category.id)}
-                onChange={() => handleCategoryToggle(category.id)}
-              />
-              {category.name}
-            </label>
+            <div
+              key={category.id}
+              className={`category-dropdown ${editingCategories ? "open" : ""}`}
+            >
+              <label>
+                <input
+                  type="checkbox"
+                  checked={selectedCategories.some((c) => c.id === category.id)}
+                  onChange={() => handleCategoryToggle(category.id)}
+                />
+                {category.name}
+              </label>
+            </div>
           ))}
-          <button onClick={handleAddCategories}>Add Categories</button>
-          {/* <button onClick={handleRemoveCategories}>Remove Categories</button> */}
-          <button onClick={() => setEditingCategories(false)}>Cancel</button>
         </div>
       )}
     </li>

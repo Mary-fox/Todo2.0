@@ -64,23 +64,16 @@ export const fetchTaskCategories = async (taskId: number): Promise<Category[]> =
   }
 };
 
-export const addCategoriesToTask = async (taskId: number, categoryIds: number[]) => {
+export const addCategoryToTask = async (taskId: number, categoryId: number) => {
   try {
-    await $host.post(`/api/tasks/${taskId}/categories`, { categoryIds }); // Отправляем POST-запрос на сервер
+    await $host.post(`/api/tasks/${taskId}/categories/${categoryId}`);
   } catch (error) {
-    console.error("Error adding categories to task:", error);
+    console.error("Error adding category to task:", error);
     throw error;
   }
 };
 
-// export const removeCategoriesFromTask = async (taskId: number, categoryIds: number[]) => {
-//   try {
-//     await $host.delete(`/api/tasks/${taskId}/categories`, { data: { categoryIds } }); // Отправляем DELETE-запрос на сервер с данными о категориях
-//   } catch (error) {
-//     console.error("Error removing categories from task:", error);
-//     throw error;
-//   }
-// };
+
 export const removeCategoryFromTask = async (taskId: number, categoryId: number) => {
   try {
     const response = await $host.delete(`/api/tasks/${taskId}/categories/${categoryId}`);

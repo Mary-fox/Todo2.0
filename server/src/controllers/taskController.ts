@@ -83,10 +83,10 @@ export const deleteTask = async (req: Request, res: Response, next: NextFunction
   }
 };
 
-export const addCategoriesToTask = async (req: Request, res: Response) => {
+export const addCategoryToTask = async (req: Request, res: Response) => {
   try {
     const taskId = req.params.id;
-    const { categoryIds } = req.body;
+    const categoryId = req.params.categoryId; // Получаем ID категории из параметров запроса
 
     const task = await Task.findByPk(taskId);
 
@@ -94,12 +94,18 @@ export const addCategoriesToTask = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Task not found' });
     }
 
+    const categoryToAdd = await Category.findByPk(categoryId);
 
-    await task.addCategory(categoryIds);
+    if (!categoryToAdd) {
+      return res.status(404).json({ error: 'Category not found' });
+    }
 
-    res.status(200).json({ message: 'Categories added to task successfully' });
+    // Добавляем связь категории к задаче
+    await task.addCategory(categoryToAdd);
+
+    res.status(200).json({ message: 'Category added to task successfully' });
   } catch (error) {
-    console.error("Error adding categories to task:", error);
+    console.error("Error adding category to task:", error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
@@ -124,26 +130,7 @@ export const getTaskCategories = async (req: Request, res: Response) => {
     return res.status(500).json({ message: 'Server error' });
   }
 };
-// export const removeCategoriesFromTask = async (req: Request, res: Response) => {
-//   try {
-//     const taskId = req.params.id;
-//     const { categoryIds } = req.body;
 
-//     const task = await Task.findByPk(taskId);
-
-//     if (!task) {
-//       return res.status(404).json({ error: 'Task not found' });
-//     }
-
-//     // Предполагается, что у вас есть метод removeCategories
-//     await task.removeCategories(categoryIds);
-
-//     res.status(200).json({ message: 'Categories removed from task successfully' });
-//   } catch (error) {
-//     console.error("Error removing categories from task:", error);
-//     res.status(500).json({ error: 'Internal Server Error' });
-//   }
-// };
 export const removeCategoryFromTask = async (req: Request, res: Response) => {
   try {
     const taskId = req.params.id;
