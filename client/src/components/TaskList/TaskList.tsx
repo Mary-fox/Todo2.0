@@ -10,9 +10,7 @@ interface TaskListProps {
 }
 
 const TaskList: React.FC<TaskListProps> = ({ filteredTasks, setTasks }) => {
-  const [editingCategories, setEditingCategories] = useState<number | boolean>(
-    false,
-  );
+  const [editingCategories, setEditingCategories] = useState<number | boolean>(false);
 
   const toggleCategoryDropdown = (taskId: number) => {
     if (editingCategories === taskId) {

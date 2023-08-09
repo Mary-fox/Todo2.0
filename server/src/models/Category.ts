@@ -17,9 +17,10 @@ class Category extends Model<CategoryAttributes> {
 
   static async initializeDefaultCategories() {
     const defaultCategoriesData: Omit<CategoryAttributes, 'id'>[] = [
-      { name: 'Category 1', color: 'red' },
-      { name: 'Category 2', color: 'green' },
-      { name: 'Category 3', color: 'blue' },
+      { name: 'Важное', color: 'red' },
+      { name: 'Для дома', color: 'green' },
+      { name: 'Для работы', color: 'blue' },
+      { name: 'Задачи на неделю', color: 'blue' },
     ];
 
     try {

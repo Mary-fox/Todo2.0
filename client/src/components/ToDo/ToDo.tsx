@@ -3,14 +3,13 @@ import TaskForm from "../TaskForm/TaskForm";
 import TaskList from "../TaskList/TaskList";
 import { Category, Task } from "../../../../server/src/types/types";
 import { fetchTasks, fetchCategories } from "../../http/apiTasks";
+import "./ToDo.css";
 
 const ToDo: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [taskFilter, setTaskFilter] = useState<string>("");
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<number | undefined>(
-    undefined,
-  );
+  const [selectedCategory, setSelectedCategory] = useState<number | undefined>(undefined);
   const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
 
   useEffect(() => {
@@ -20,9 +19,7 @@ const ToDo: React.FC = () => {
 
   useEffect(() => {
     // Фильтруем задачи на основе текста из инпута
-    const filtered = tasks.filter((task) =>
-      task.title.toUpperCase().includes(taskFilter.toUpperCase()),
-    );
+    const filtered = tasks.filter((task) => task.title.toUpperCase().includes(taskFilter.toUpperCase()));
     setFilteredTasks(filtered);
   }, [taskFilter, tasks]);
 
@@ -42,18 +39,15 @@ const ToDo: React.FC = () => {
       console.error("Error fetching categories:", error);
     }
   };
-  const handleCategoryChange = (
-    event: React.ChangeEvent<HTMLSelectElement>,
-  ) => {
-    const categoryId = event.target.value
-      ? Number(event.target.value)
-      : undefined;
+  const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const categoryId = event.target.value ? Number(event.target.value) : undefined;
     setSelectedCategory(categoryId);
   };
 
   return (
     <div className="tasks__block">
       <h1 className="tasks__title">My Todo List</h1>
+      <TaskForm setTasks={setTasks} />
       <input
         value={taskFilter}
         type="text"
@@ -68,12 +62,7 @@ const ToDo: React.FC = () => {
           </option>
         ))}
       </select>
-      <TaskList
-        tasks={tasks}
-        filteredTasks={filteredTasks}
-        setTasks={setTasks}
-      />
-      <TaskForm setTasks={setTasks} categories={categories} />
+      <TaskList tasks={tasks} filteredTasks={filteredTasks} setTasks={setTasks} />
     </div>
   );
 };

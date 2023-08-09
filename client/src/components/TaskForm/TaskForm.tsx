@@ -1,14 +1,13 @@
 import React, { useState } from "react";
-import { Task, Category } from "../../../../server/src/types/types";
+import { Task } from "../../../../server/src/types/types";
 import "./TaskForm.css";
 import { addTask } from "../../http/apiTasks";
 
 interface TaskFormProps {
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
-  categories: Category[];
 }
 
-const TaskForm: React.FC<TaskFormProps> = ({ categories, setTasks }) => {
+const TaskForm: React.FC<TaskFormProps> = ({ setTasks }) => {
   const [taskText, setTaskText] = useState<string>("");
 
   const handleAddTask = async () => {
@@ -29,20 +28,16 @@ const TaskForm: React.FC<TaskFormProps> = ({ categories, setTasks }) => {
 
   return (
     <div className="task-form">
-      <input
-        type="text"
-        value={taskText}
-        onChange={(e) => setTaskText(e.target.value)}
-      />
+      <input type="text" value={taskText} onChange={(e) => setTaskText(e.target.value)} />
       <button onClick={handleAddTask}>Add Task</button>
-      <select>
+      {/* <select>
         <option value={undefined}>Select Category</option>
         {categories.map((category) => (
           <option key={category.id} value={category.id}>
             {category.name}
           </option>
         ))}
-      </select>
+      </select> */}
     </div>
   );
 };

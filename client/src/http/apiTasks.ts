@@ -21,10 +21,7 @@ export const addTask = async (task: Task) => {
   }
 };
 
-export const updateTask = async (
-  taskId: number,
-  updatedTask: Partial<Task>,
-): Promise<Task> => {
+export const updateTask = async (taskId: number, updatedTask: Partial<Task>): Promise<Task> => {
   try {
     const response = await $host.put(`/api/tasks/${taskId}`, updatedTask);
     return response.data;
@@ -66,20 +63,20 @@ export const fetchTaskCategories = async (taskId: number): Promise<Category[]> =
 
 export const addCategoryToTask = async (taskId: number, categoryId: number) => {
   try {
-    await $host.post(`/api/tasks/${taskId}/categories/${categoryId}`);
+    const response = await $host.post(`/api/tasks/${taskId}/categories/${categoryId}`);
+    return response.data;
   } catch (error) {
     console.error("Error adding category to task:", error);
     throw error;
   }
 };
 
-
 export const removeCategoryFromTask = async (taskId: number, categoryId: number) => {
   try {
     const response = await $host.delete(`/api/tasks/${taskId}/categories/${categoryId}`);
-    return response.data; // Если вы хотите обработать ответ сервера
+    return response.data;
   } catch (error) {
-    console.error('Error removing category from task:', error);
+    console.error("Error removing category from task:", error);
     throw error;
   }
 };
