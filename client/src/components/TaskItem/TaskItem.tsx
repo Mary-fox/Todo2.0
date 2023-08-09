@@ -10,6 +10,7 @@ import {
   addCategoryToTask,
   removeCategoryFromTask,
 } from "../../http/apiTasks";
+import CategoryDropdown from "../CategoryDropdown/CategoryDropdown";
 
 interface TaskItemProps {
   task: Task;
@@ -18,12 +19,7 @@ interface TaskItemProps {
   toggleCategoryDropdown: (taskId: number) => void;
 }
 
-const TaskItem: React.FC<TaskItemProps> = ({
-  task,
-  setTasks,
-  editingCategories,
-  toggleCategoryDropdown,
-}) => {
+const TaskItem: React.FC<TaskItemProps> = ({ task, setTasks, editingCategories, toggleCategoryDropdown }) => {
   const [editing, setEditing] = useState<boolean>(false);
   const [editValue, setEditValue] = useState<string>(task.title);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -46,9 +42,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
 
   const handleCategoryToggle = (categoryId: number) => {
     if (selectedCategories.some((category) => category.id === categoryId)) {
-      setSelectedCategories(
-        selectedCategories.filter((c) => c.id !== categoryId),
-      );
+      setSelectedCategories(selectedCategories.filter((c) => c.id !== categoryId));
     } else {
       const selectedCategory = categories.find((c) => c.id === categoryId);
       if (selectedCategory) {
@@ -61,18 +55,14 @@ const TaskItem: React.FC<TaskItemProps> = ({
   async function handleAddCategory(categoryId: number) {
     try {
       await addCategoryToTask(task.id, categoryId);
-
       // Обновляем данные категорий для задачи после добавления
       const updatedCategories = await fetchTaskCategories(task.id);
-
       // Обновляем состояние задачи на клиенте
       const updatedTask = {
         ...task,
         categories: updatedCategories, // Обновляем категории в состоянии задачи
       };
-      setTasks((prevTasks) =>
-        prevTasks.map((t) => (t.id === task.id ? updatedTask : t)),
-      );
+      setTasks((prevTasks) => prevTasks.map((t) => (t.id === task.id ? updatedTask : t)));
       setSelectedCategories(updatedCategories);
     } catch (error) {
       console.error("Error adding category:", error);
@@ -90,9 +80,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
         ...task,
         categories: updatedCategories, // Обновляем категории в состоянии задачи
       };
-      setTasks((prevTasks) =>
-        prevTasks.map((t) => (t.id === task.id ? updatedTask : t)),
-      );
+      setTasks((prevTasks) => prevTasks.map((t) => (t.id === task.id ? updatedTask : t)));
       setSelectedCategories(updatedCategories);
     } catch (error) {
       console.error("Error removing category:", error);
@@ -121,9 +109,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
     try {
       const updatedTask = { ...task, title: editValue };
       await updateTask(task.id, updatedTask);
-      setTasks((prevTasks) =>
-        prevTasks.map((t) => (t.id === task.id ? updatedTask : t)),
-      );
+      setTasks((prevTasks) => prevTasks.map((t) => (t.id === task.id ? updatedTask : t)));
       setEditing(false);
     } catch (error) {
       console.error("Error updating task:", error);
@@ -133,79 +119,66 @@ const TaskItem: React.FC<TaskItemProps> = ({
     try {
       const updatedTask = { ...task, completed: !task.completed };
       await updateTask(task.id, updatedTask); // Ожидаем, пока задача обновится на сервере
-      setTasks((prevTasks) =>
-        prevTasks.map((t) => (t.id === task.id ? updatedTask : t)),
-      ); // Обновляем локальное состояние клиента с новым статусом задачи
+      setTasks((prevTasks) => prevTasks.map((t) => (t.id === task.id ? updatedTask : t))); // Обновляем локальное состояние клиента с новым статусом задачи
     } catch (error) {
       console.error("Error updating task:", error);
     }
   }
 
   return (
-    <li key={task.id} className="task">
-      <input
-        type="checkbox"
-        checked={task.completed}
-        onChange={handleComplete}
-      />
-      {editing ? (
-        <>
-          <input
-            type="text"
-            value={editValue}
-            onChange={(e) => setEditValue(e.target.value)}
-          />
-          <div className="task__buttons">
-            <button onClick={handleSave}>Save</button>
-            <button onClick={handleCancel}>Cancel</button>
-          </div>
-        </>
-      ) : (
-        <>
-          <span
-            className={classNames("task__text", {
-              task_completed: task.completed,
-            })}
-          >
-            {task.title}
-          </span>
-          {selectedCategories.map((category) => (
-            <div className="category-chip" key={category.id}>
-              {category.name}
-              <button onClick={() => handleRemoveCategory(category.id)}>
-                x
-              </button>
+    <>
+      <li key={task.id} className="task">
+        <div className="task__content">
+          <div className="task__main">
+            <div className="task__title">
+              <input type="checkbox" checked={task.completed} onChange={handleComplete} />
+              {editing ? (
+                <>
+                  <input type="text" value={editValue} onChange={(e) => setEditValue(e.target.value)} />
+                  <div className="task__buttons">
+                    <button onClick={handleSave}>Save</button>
+                    <button onClick={handleCancel}>Cancel</button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <span
+                    className={classNames("task__text", {
+                      task_completed: task.completed,
+                    })}
+                  >
+                    {task.title}
+                  </span>
+                </>
+              )}
             </div>
-          ))}
-          <div className="task__buttons">
-            <button onClick={handleEdit}>Edit</button>
-            <button onClick={handleDelete}>Delete</button>
+
+            <div className="task__buttons">
+              <button onClick={handleEdit}>Edit</button>
+              <button onClick={handleDelete}>Delete</button>
+            </div>
+          </div>
+
+          <div className="category">
+            {selectedCategories.map((category) => (
+              <div className="category__chip" key={category.id}>
+                {category.name}
+                <button onClick={() => handleRemoveCategory(category.id)}>x</button>
+              </div>
+            ))}
             <button onClick={() => toggleCategoryDropdown(task.id)}>
               {editingCategories ? "Cancel" : "Add"}
             </button>
           </div>
-        </>
-      )}
-      {editingCategories && (
-        <div className="category-dialog">
-          {categories.map((category) => (
-            <div
-              key={category.id}
-              className={`category-dropdown ${editingCategories ? "open" : ""}`}
-            >
-              <label>
-                <input
-                  type="checkbox"
-                  checked={selectedCategories.some((c) => c.id === category.id)}
-                  onChange={() => handleCategoryToggle(category.id)}
-                />
-                {category.name}
-              </label>
-            </div>
-          ))}
         </div>
-      )}
-    </li>
+      </li>
+      <CategoryDropdown
+        categories={categories}
+        selectedCategories={selectedCategories}
+        editingCategories={editingCategories}
+        handleCategoryToggle={handleCategoryToggle}
+      />
+    </>
   );
 };
 
