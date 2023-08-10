@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Task } from "../../../../server/src/types/types";
-import "./TaskForm.css";
 import { addTask } from "../../http/apiTasks";
+import { Form, FormInput, FormBtn } from "./TaskForm.styled";
 
 interface TaskFormProps {
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
@@ -10,7 +10,8 @@ interface TaskFormProps {
 const TaskForm: React.FC<TaskFormProps> = ({ setTasks }) => {
   const [taskText, setTaskText] = useState<string>("");
 
-  const handleAddTask = async () => {
+  const handleAddTask = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (taskText.trim() === "") return;
     try {
       const newTask: Partial<Task> = {
@@ -27,18 +28,15 @@ const TaskForm: React.FC<TaskFormProps> = ({ setTasks }) => {
   };
 
   return (
-    <div className="task-form">
-      <input type="text" value={taskText} onChange={(e) => setTaskText(e.target.value)} />
-      <button onClick={handleAddTask}>Add Task</button>
-      {/* <select>
-        <option value={undefined}>Select Category</option>
-        {categories.map((category) => (
-          <option key={category.id} value={category.id}>
-            {category.name}
-          </option>
-        ))}
-      </select> */}
-    </div>
+    <Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleAddTask(event)}>
+      <FormInput
+        type="text"
+        placeholder={"Add task..."}
+        value={taskText}
+        onChange={(e) => setTaskText(e.target.value)}
+      />
+      <FormBtn>Add Task</FormBtn>
+    </Form>
   );
 };
 

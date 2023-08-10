@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Task } from "../../../../server/src/types/types";
-import "./TaskList.css";
 import TaskItem from "../TaskItem/TaskItem";
+import { List } from "./TaskList.styled";
 
 interface TaskListProps {
   tasks: Task[];
@@ -20,7 +20,7 @@ const TaskList: React.FC<TaskListProps> = ({ filteredTasks, setTasks }) => {
     }
   };
   return (
-    <ol className="tasks">
+    <List>
       {Array.isArray(filteredTasks)
         ? filteredTasks.map((task) => (
             <TaskItem
@@ -32,7 +32,7 @@ const TaskList: React.FC<TaskListProps> = ({ filteredTasks, setTasks }) => {
             />
           ))
         : null}
-    </ol>
+    </List>
   );
 };
 

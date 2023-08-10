@@ -3,7 +3,7 @@ import TaskForm from "../TaskForm/TaskForm";
 import TaskList from "../TaskList/TaskList";
 import { Category, Task } from "../../../../server/src/types/types";
 import { fetchTasks, fetchCategories } from "../../http/apiTasks";
-import "./ToDo.css";
+import { TaskTitle, TaskBlock, TaskFilter, TaskFiltersBlock, TaskSelect } from "./ToDo.styled";
 
 const ToDo: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -45,25 +45,28 @@ const ToDo: React.FC = () => {
   };
 
   return (
-    <div className="tasks__block">
-      <h1 className="tasks__title">My Todo List</h1>
+    <TaskBlock>
+      <TaskTitle>My Todo List</TaskTitle>
       <TaskForm setTasks={setTasks} />
-      <input
-        value={taskFilter}
-        type="text"
-        placeholder="filter"
-        onChange={(e) => setTaskFilter(e.target.value)}
-      />
-      <select value={selectedCategory} onChange={handleCategoryChange}>
-        <option value={undefined}>All</option>
-        {categories.map((category) => (
-          <option key={category.id} value={category.id}>
-            {category.name}
-          </option>
-        ))}
-      </select>
+      <TaskFiltersBlock>
+        <TaskFilter
+          value={taskFilter}
+          type="text"
+          placeholder="filter"
+          onChange={(e) => setTaskFilter(e.target.value)}
+        />
+        <TaskSelect value={selectedCategory} onChange={handleCategoryChange}>
+          <option value={undefined}>All</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
+          ))}
+        </TaskSelect>
+      </TaskFiltersBlock>
+
       <TaskList tasks={tasks} filteredTasks={filteredTasks} setTasks={setTasks} />
-    </div>
+    </TaskBlock>
   );
 };
 
