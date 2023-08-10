@@ -8,7 +8,7 @@ export const getAllCategories = async (req: Request, res: Response, next: NextFu
     res.json(categories);
   } catch (error) {
     console.error("Error fetching categories:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    return next(ApiError.internal("Internal Server Error"));
   }
 };
 
