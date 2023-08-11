@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import classNames from "classnames";
 import { Task, Category } from "../../../../server/src/types/types";
 import {
   deleteTask,
@@ -8,6 +7,7 @@ import {
   fetchTaskCategories,
   removeCategoryFromTask,
 } from "../../http/apiTasks";
+import classNames from "classnames";
 import { Wrapper, Item, TaskBtns, TaskContent, TaskMain, TaskText, TaskTitle } from "./TaskItem.styled";
 //icons
 import CategoryDropdown from "../CategoryDropdown/CategoryDropdown";
