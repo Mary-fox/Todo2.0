@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import TaskForm from "../TaskForm/TaskForm";
 import TaskList from "../TaskList/TaskList";
 import { Category, Task } from "../../../../server/src/types/types";
-import { fetchTasks, fetchCategories } from "../../http/apiTasks";
+import { fetchTasks, fetchCategories, fetchTaskCategories } from "../../http/apiTasks";
 import { TaskTitle, TaskBlock, TaskFilter, TaskFiltersBlock, TaskSelect } from "./ToDo.styled";
 
 const ToDo: React.FC = () => {
@@ -18,19 +18,35 @@ const ToDo: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // Фильтруем задачи на основе текста из инпута
-    const filtered = tasks.filter((task) => task.title.toUpperCase().includes(taskFilter.toUpperCase()));
+    // Фильтруем задачи на основе текста из инпута или категорий
+    const filtered = tasks.filter((task) => {
+      // Получаем массив ID категорий для данной задачи
+      const taskCategoryIds = task.categories?.map((category) => category.id) || [];
+      return (
+        task.title.toUpperCase().includes(taskFilter.toUpperCase()) &&
+        (!selectedCategory || (taskCategoryIds && taskCategoryIds.includes(selectedCategory)))
+      );
+    });
     setFilteredTasks(filtered);
-  }, [taskFilter, tasks]);
+  }, [taskFilter, selectedCategory, tasks]);
 
   const fetchTasksFromApi = async () => {
     try {
       const tasks = await fetchTasks();
-      setTasks(tasks);
+      // Для каждой задачи запрашиваем её категории с сервера
+      const tasksWithCategories = await Promise.all(
+        tasks.map(async (task: Task) => {
+          const categories = await fetchTaskCategories(task.id);
+          // Возвращаем объект задачи, дополненный списком категорий
+          return { ...task, categories };
+        }),
+      );
+      setTasks(tasksWithCategories); // Обновляем состояние задач с категориями
     } catch (error) {
       console.error("Error fetching tasks:", error);
     }
   };
+
   const fetchCategoriesFromApi = async () => {
     try {
       const categories = await fetchCategories();
@@ -56,7 +72,7 @@ const ToDo: React.FC = () => {
           onChange={(e) => setTaskFilter(e.target.value)}
         />
         <TaskSelect value={selectedCategory} onChange={handleCategoryChange}>
-          <option value={undefined}>All</option>
+          <option value="">All</option>
           {categories.map((category) => (
             <option key={category.id} value={category.id}>
               {category.name}
