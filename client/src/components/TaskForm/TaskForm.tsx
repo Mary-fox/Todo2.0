@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Task } from "../../../../server/src/types/types";
+import { Task } from "../../types/types";
 import { addTask } from "../../http/apiTasks";
 import { Form, FormInput, FormBtn } from "./TaskForm.styled";
 
@@ -20,8 +20,8 @@ const TaskForm: React.FC<TaskFormProps> = ({ setTasks }) => {
       };
 
       const addedTask = await addTask(newTask as Task);
-      setTasks((prevTasks) => [...prevTasks, addedTask]);
       setTaskText("");
+      setTasks((prevTasks) => [...prevTasks, addedTask]);
     } catch (error) {
       console.error("Error adding task:", error);
     }
@@ -40,4 +40,4 @@ const TaskForm: React.FC<TaskFormProps> = ({ setTasks }) => {
   );
 };
 
-export default TaskForm;
+export default React.memo(TaskForm, () => true);

@@ -1,5 +1,5 @@
 import React from "react";
-import { Task, Category } from "../../../../server/src/types/types";
+import { Task, Category } from "../../types/types";
 import CategoryChip from "../CategoryChip/CategoryChip";
 import cancelIcon from "../../assets/icons/cancel.svg";
 import addIcon from "../../assets/icons/add.svg";
@@ -36,4 +36,4 @@ const CategoryChips: React.FC<CategoryChipsProps> = ({
   );
 };
 
-export default CategoryChips;
+export default React.memo(CategoryChips);

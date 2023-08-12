@@ -1,5 +1,5 @@
-import React from "react";
-import { Task, Category } from "../../../../server/src/types/types";
+import React, { useCallback } from "react";
+import { Task, Category } from "../../types/types";
 import { CategoryBlock, Dropdown, DropdownInput, DropdownItem } from "./CategoryDropdown,styled";
 import { fetchTaskCategories, addCategoryToTask } from "../../http/apiTasks";
 
@@ -22,18 +22,21 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
   editingCategories,
   handleRemoveCategory,
 }) => {
-  const handleCategoryToggle = (categoryId: number) => {
-    if (selectedCategories.some((category) => category.id === categoryId)) {
-      setSelectedCategories(selectedCategories.filter((c) => c.id !== categoryId));
-      handleRemoveCategory(categoryId);
-    } else {
-      const selectedCategory = categories.find((c) => c.id === categoryId);
-      if (selectedCategory) {
-        setSelectedCategories([...selectedCategories, selectedCategory]);
-        handleAddCategory(selectedCategory.id);
+  const handleCategoryToggle = useCallback(
+    (categoryId: number) => {
+      if (selectedCategories.some((category) => category.id === categoryId)) {
+        setSelectedCategories(selectedCategories.filter((c) => c.id !== categoryId));
+        handleRemoveCategory(categoryId);
+      } else {
+        const selectedCategory = categories.find((c) => c.id === categoryId);
+        if (selectedCategory) {
+          setSelectedCategories([...selectedCategories, selectedCategory]);
+          handleAddCategory(selectedCategory.id);
+        }
       }
-    }
-  };
+    },
+    [selectedCategories, categories, setSelectedCategories, handleRemoveCategory],
+  );
 
   async function handleAddCategory(categoryId: number) {
     try {

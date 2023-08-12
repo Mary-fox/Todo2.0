@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Task, Category } from "../../../../server/src/types/types";
+import React, { useState, useEffect, useCallback } from "react";
+import { Task, Category } from "../../types/types";
 import {
   deleteTask,
   updateTask,
@@ -30,57 +30,61 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, setTasks, editingCategories, 
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([]); // состояние для категорий задачи
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const categoriesData = await fetchCategories();
-        setCategories(categoriesData);
-        const taskCategoriesData = await fetchTaskCategories(task.id);
-        setSelectedCategories(taskCategoriesData);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-    fetchData();
+  const fetchData = useCallback(async () => {
+    try {
+      const categoriesData = await fetchCategories();
+      setCategories(categoriesData);
+      const taskCategoriesData = await fetchTaskCategories(task.id);
+      setSelectedCategories(taskCategoriesData);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
   }, [task.id]);
 
-  async function handleRemoveCategory(categoryId: number) {
-    try {
-      await removeCategoryFromTask(task.id, categoryId);
-      // Обновляем данные категорий для задачи после удаления
-      const updatedCategories = await fetchTaskCategories(task.id);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
-      // Обновляем состояние задачи на клиенте
-      const updatedTask = {
-        ...task,
-        categories: updatedCategories, // Обновляем категории в состоянии задачи
-      };
-      setTasks((prevTasks) => prevTasks.map((t) => (t.id === task.id ? updatedTask : t)));
-      setSelectedCategories(updatedCategories);
-    } catch (error) {
-      console.error("Error removing category:", error);
-    }
-  }
+  const handleRemoveCategory = useCallback(
+    async (categoryId: number) => {
+      try {
+        await removeCategoryFromTask(task.id, categoryId);
+        // Обновляем данные категорий для задачи после удаления
+        const updatedCategories = await fetchTaskCategories(task.id);
 
-  async function handleDelete() {
+        // Обновляем состояние задачи на клиенте
+        const updatedTask = {
+          ...task,
+          categories: updatedCategories, // Обновляем категории в состоянии задачи
+        };
+        setTasks((prevTasks) => prevTasks.map((t) => (t.id === task.id ? updatedTask : t)));
+        setSelectedCategories(updatedCategories);
+      } catch (error) {
+        console.error("Error removing category:", error);
+      }
+    },
+    [task.id, setTasks, editingCategories, task],
+  );
+
+  const handleDelete = useCallback(async () => {
     try {
       await deleteTask(task.id);
       setTasks((prevTasks) => prevTasks.filter((t) => t.id !== task.id));
     } catch (error) {
       console.error("Error deleting task:", error);
     }
-  }
+  }, [task.id, setTasks]);
 
-  async function handleEdit() {
+  const handleEdit = useCallback(() => {
     setEditing(true);
-  }
+  }, []);
 
-  async function handleCancel() {
+  const handleCancel = useCallback(() => {
     setEditing(false);
     setEditValue(task.title);
-  }
+  }, [task.title]);
 
-  async function handleSave() {
+  const handleSave = useCallback(async () => {
     try {
       const updatedTask = { ...task, title: editValue };
       await updateTask(task.id, updatedTask);
@@ -89,7 +93,8 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, setTasks, editingCategories, 
     } catch (error) {
       console.error("Error updating task:", error);
     }
-  }
+  }, [task.id, editValue, setTasks]);
+
   async function handleComplete() {
     try {
       const updatedTask = { ...task, completed: !task.completed };
@@ -99,7 +104,6 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, setTasks, editingCategories, 
       console.error("Error updating task:", error);
     }
   }
-
   return (
     <Wrapper>
       <Item key={task.id}>
@@ -155,5 +159,6 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, setTasks, editingCategories, 
     </Wrapper>
   );
 };
-
-export default TaskItem;
+export default React.memo(TaskItem, (prevProps, nextProps) => {
+  return prevProps.task === nextProps.task && prevProps.editingCategories === nextProps.editingCategories;
+});

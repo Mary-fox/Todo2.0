@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import TaskForm from "../TaskForm/TaskForm";
 import TaskList from "../TaskList/TaskList";
-import { Category, Task } from "../../../../server/src/types/types";
+import { Category, Task } from "../../types/types";
 import { fetchTasks, fetchCategories, fetchTaskCategories } from "../../http/apiTasks";
 import { TaskTitle, TaskBlock, TaskFilter, TaskFiltersBlock, TaskSelect } from "./ToDo.styled";
 
@@ -41,7 +41,10 @@ const ToDo: React.FC = () => {
           return { ...task, categories };
         }),
       );
-      setTasks(tasksWithCategories); // Обновляем состояние задач с категориями
+      // Сортируем задачи с категориями по ID
+      const sortedTasks = tasksWithCategories.sort((a, b) => a.id - b.id);
+
+      setTasks(sortedTasks);
     } catch (error) {
       console.error("Error fetching tasks:", error);
     }
@@ -86,4 +89,4 @@ const ToDo: React.FC = () => {
   );
 };
 
-export default ToDo;
+export default React.memo(ToDo);

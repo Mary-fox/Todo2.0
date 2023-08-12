@@ -1,5 +1,5 @@
 import { $host } from "./Api";
-import { Task, Category } from "../../../server/src/types/types";
+import { Task, Category } from "../types/types";
 
 export const fetchTasks = async () => {
   try {

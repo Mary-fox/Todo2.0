@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Task } from "../../../../server/src/types/types";
+import { Task } from "../../types/types";
 import TaskItem from "../TaskItem/TaskItem";
 import { List } from "./TaskList.styled";
 
@@ -36,4 +36,4 @@ const TaskList: React.FC<TaskListProps> = ({ filteredTasks, setTasks }) => {
   );
 };
 
-export default TaskList;
+export default React.memo(TaskList);
