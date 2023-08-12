@@ -21,17 +21,15 @@ const TaskList: React.FC<TaskListProps> = ({ filteredTasks, setTasks }) => {
   };
   return (
     <List>
-      {Array.isArray(filteredTasks)
-        ? filteredTasks.map((task) => (
-            <TaskItem
-              key={task.id}
-              task={task}
-              setTasks={setTasks}
-              editingCategories={editingCategories === task.id} // Use editingCategories directly
-              toggleCategoryDropdown={toggleCategoryDropdown}
-            />
-          ))
-        : null}
+      {filteredTasks.map((task) => (
+        <TaskItem
+          key={task.id}
+          task={task}
+          setTasks={setTasks}
+          editingCategories={editingCategories === task.id}
+          toggleCategoryDropdown={toggleCategoryDropdown}
+        />
+      ))}
     </List>
   );
 };

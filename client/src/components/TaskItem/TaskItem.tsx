@@ -29,6 +29,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, setTasks, editingCategories, 
   const [editValue, setEditValue] = useState<string>(task.title);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([]); // состояние для категорий задачи
+  const [dataLoaded, setDataLoaded] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
@@ -36,6 +37,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, setTasks, editingCategories, 
       setCategories(categoriesData);
       const taskCategoriesData = await fetchTaskCategories(task.id);
       setSelectedCategories(taskCategoriesData);
+      setDataLoaded(true);
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
@@ -106,47 +108,52 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, setTasks, editingCategories, 
   }
   return (
     <Wrapper>
-      <Item key={task.id}>
-        <TaskContent>
-          <TaskMain>
-            <TaskTitle>
-              <input type="checkbox" checked={task.completed} onChange={handleComplete} />
-              {editing ? (
-                <>
-                  <input type="text" value={editValue} onChange={(e) => setEditValue(e.target.value)} />
-                  <TaskBtns>
-                    <button onClick={handleSave}>
-                      <img src={saveIcon} alt="Save Icon" />
-                    </button>
-                    <button onClick={handleCancel}>
-                      <img src={cancelIcon} alt="Cancel Icon" />
-                    </button>
-                  </TaskBtns>
-                </>
-              ) : (
-                <>
-                  <TaskText className={classNames({ task_completed: task.completed })}>{task.title}</TaskText>
-                  <TaskBtns>
-                    <button onClick={handleEdit}>
-                      <img src={editIcon} alt="Edit Icon" />
-                    </button>
-                    <button onClick={handleDelete}>
-                      <img src={deleteIcon} alt="Delete Icon" />
-                    </button>
-                  </TaskBtns>
-                </>
-              )}
-            </TaskTitle>
-          </TaskMain>
-          <CategoryChips
-            task={task}
-            editingCategories={editingCategories}
-            handleRemoveCategory={handleRemoveCategory}
-            toggleCategoryDropdown={toggleCategoryDropdown}
-            selectedCategories={selectedCategories}
-          />
-        </TaskContent>
-      </Item>
+      {" "}
+      {dataLoaded && (
+        <Item key={task.id}>
+          <TaskContent>
+            <TaskMain>
+              <TaskTitle>
+                <input type="checkbox" checked={task.completed} onChange={handleComplete} />
+                {editing ? (
+                  <>
+                    <input type="text" value={editValue} onChange={(e) => setEditValue(e.target.value)} />
+                    <TaskBtns>
+                      <button onClick={handleSave}>
+                        <img src={saveIcon} alt="Save Icon" />
+                      </button>
+                      <button onClick={handleCancel}>
+                        <img src={cancelIcon} alt="Cancel Icon" />
+                      </button>
+                    </TaskBtns>
+                  </>
+                ) : (
+                  <>
+                    <TaskText className={classNames({ task_completed: task.completed })}>
+                      {task.title}
+                    </TaskText>
+                    <TaskBtns>
+                      <button onClick={handleEdit}>
+                        <img src={editIcon} alt="Edit Icon" />
+                      </button>
+                      <button onClick={handleDelete}>
+                        <img src={deleteIcon} alt="Delete Icon" />
+                      </button>
+                    </TaskBtns>
+                  </>
+                )}
+              </TaskTitle>
+            </TaskMain>
+            <CategoryChips
+              task={task}
+              editingCategories={editingCategories}
+              handleRemoveCategory={handleRemoveCategory}
+              toggleCategoryDropdown={toggleCategoryDropdown}
+              selectedCategories={selectedCategories}
+            />
+          </TaskContent>
+        </Item>
+      )}
       <CategoryDropdown
         task={task}
         setTasks={setTasks}

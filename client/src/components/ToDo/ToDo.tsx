@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import TaskForm from "../TaskForm/TaskForm";
 import TaskList from "../TaskList/TaskList";
+import Loader from "../Loader/Loader";
 import { Category, Task } from "../../types/types";
 import { fetchTasks, fetchCategories, fetchTaskCategories } from "../../http/apiTasks";
 import { TaskTitle, TaskBlock, TaskFilter, TaskFiltersBlock, TaskSelect } from "./ToDo.styled";
@@ -11,6 +12,7 @@ const ToDo: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number | undefined>(undefined);
   const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetchTasksFromApi();
@@ -32,6 +34,7 @@ const ToDo: React.FC = () => {
 
   const fetchTasksFromApi = async () => {
     try {
+      setIsLoading(true);
       const tasks = await fetchTasks();
       // Для каждой задачи запрашиваем её категории с сервера
       const tasksWithCategories = await Promise.all(
@@ -47,15 +50,20 @@ const ToDo: React.FC = () => {
       setTasks(sortedTasks);
     } catch (error) {
       console.error("Error fetching tasks:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const fetchCategoriesFromApi = async () => {
     try {
+      setIsLoading(true);
       const categories = await fetchCategories();
       setCategories(categories); // Обновляем состояние категорий
     } catch (error) {
       console.error("Error fetching categories:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
   const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -84,7 +92,7 @@ const ToDo: React.FC = () => {
         </TaskSelect>
       </TaskFiltersBlock>
 
-      <TaskList tasks={tasks} filteredTasks={filteredTasks} setTasks={setTasks} />
+      {isLoading ? <Loader /> : <TaskList tasks={tasks} filteredTasks={filteredTasks} setTasks={setTasks} />}
     </TaskBlock>
   );
 };

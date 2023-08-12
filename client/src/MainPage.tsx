@@ -1,12 +1,12 @@
 import React from "react";
-import "./MainPage.css";
 import ToDo from "./components/ToDo/ToDo";
+import { Wrapper } from "./MainPage.styled";
 
 const MainPage: React.FC = () => {
   return (
-    <div className="wrapper">
+    <Wrapper>
       <ToDo />
-    </div>
+    </Wrapper>
   );
 };
 
