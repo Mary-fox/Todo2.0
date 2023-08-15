@@ -108,7 +108,6 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, setTasks, editingCategories, 
   }
   return (
     <Wrapper>
-      {" "}
       {dataLoaded && (
         <Item key={task.id}>
           <TaskContent>

@@ -11,4 +11,4 @@ export const sequelize = new Sequelize(
     port: parseInt(process.env.DB_PORT as string, 10),
     dialect: 'postgres', 
   }
-);
+)
